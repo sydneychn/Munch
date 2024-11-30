@@ -4,8 +4,8 @@ import RestaurantCard from '../components/RestaurantCard'
 import axios from 'axios'
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget'
 import MultiSelect from 'react-native-multiple-select'; // Import the MultiSelect
+import {YELP_API_KEY} from '@env';
 
-const YELP_API_KEY = "bXMF6jAbPJ2IeeZXVnRcoEWL6Po_T52-meInSTKBZsjSUNjuzd8m3bAO_4sJwOALeBdvp4Q9zosxFFOlnxRv4kkdcb0bRuJJTH9080_g4lIj5U5zmk2psjMo97jwZnYx"
 
 export default function Home() {
   const [data, setData] = useState([]); 
@@ -49,6 +49,7 @@ export default function Home() {
 
   //Swipe
   const nextRestaurant = () => {
+    
     if (currentIndex + 1 < data.length) {
       setCurrentIndex(currentIndex + 1);
     }
@@ -72,17 +73,16 @@ export default function Home() {
           location: `${city}, USA`,
           term: 'restaurants',
           sort_by: 'best_match',
-          limit: '5',
+          limit: '10',
           radius: radius,
           categories: category
           
         },
         headers: {
           accept: 'application/json',
-          Authorization: 'Bearer bXMF6jAbPJ2IeeZXVnRcoEWL6Po_T52-meInSTKBZsjSUNjuzd8m3bAO_4sJwOALeBdvp4Q9zosxFFOlnxRv4kkdcb0bRuJJTH9080_g4lIj5U5zmk2psjMo97jwZnYx',
+          Authorization: `Bearer ${YELP_API_KEY}`,
         },
       });
-
       setData(response.data.businesses);
     } catch (error) {
       console.error(error);
@@ -108,7 +108,7 @@ export default function Home() {
          {/* 
         <TextInput
           style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-          onChangeText={updatePrice}
+          onChangeText={up3datePrice}
           value={price}
           placeholder="Enter price..."
         /> */}
@@ -128,15 +128,16 @@ export default function Home() {
 
       {data[currentIndex] && (
         <View style={styles.restaurantCard}>
-          <ImageBackground
+        <ImageBackground
             style={styles.imageBackground}
-            source={{ uri: data[currentIndex].image_url }}
+            source={{ uri: data[currentIndex].image_url}}
           >
             <Text style={styles.name}>{data[currentIndex].name}</Text>
             <StarRatingDisplay
               rating={data[currentIndex].rating}
               starSize={25}
             />
+            <Text>{data[currentIndex].location['display_address']}</Text>
           </ImageBackground>
         </View>
       )}
