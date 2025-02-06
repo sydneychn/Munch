@@ -1,2 +1,2 @@
 # Munch
-Tinder for Restaurants
+Restaurant Finder App
