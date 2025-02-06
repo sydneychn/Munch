@@ -4,6 +4,8 @@ import RestaurantCard from '../components/RestaurantCard'
 import axios from 'axios'
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget'
 import MultiSelect from 'react-native-multiple-select'; // Import the MultiSelect
+import { getFirestore, collection, doc, updateDoc, arrayUnion } from 'firebase/firestore'
+import { auth } from '../service/firebase'
 import {YELP_API_KEY} from '@env';
 
 
@@ -14,6 +16,8 @@ export default function Home() {
   const [radius, setRadius] = useState(200)
   const [price, setPrice] = useState('')
   const [currentIndex, setCurrentIndex] = useState([0])
+
+  const firestore = getFirestore();
 
   const radiusOptions = [
     { id: 5, name: '5 miles' },
@@ -89,6 +93,37 @@ export default function Home() {
     }
   };
 
+  // Save the current restaurant to Firestore for the logged-in user
+  const saveRestaurant = async () => {
+
+    const currentRestaurant = data[currentIndex]; //current restaurant
+    const user = auth.currentUser;
+
+    if (user) { // check if user is logged in
+      try {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        await updateDoc(userDocRef, {
+          savedRestaurants: arrayUnion({
+            name: currentRestaurant.name,
+            city: city,
+            rating: currentRestaurant.rating,
+          }),
+        });
+        console.log('Restaurant saved to favorites!');
+      } catch (error) {
+        console.error('Error saving restaurant:', error);
+      }
+    } else {
+      console.error('No user is logged in');
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.optionsContainer}>
@@ -151,6 +186,7 @@ export default function Home() {
           />
         </>
       )} */}
+      <Button title="Save Restaurant" onPress={saveRestaurant} />
       <Button title='Next' onPress={nextRestaurant}/>
     </View>
   );
