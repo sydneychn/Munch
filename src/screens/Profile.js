@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, doc, query, where, getDoc } from 'firebase/firestore';
 
 const Profile = () => {
   //Store restaurants
@@ -11,30 +11,30 @@ const Profile = () => {
   useEffect(() => {
     const fetchSavedRestaurants = async () => {
       try {
-        const auth = getAuth(); 
-        const currentUser = auth.currentUser; //Get current user
+        const auth = getAuth();
+        const currentUser = auth.currentUser; // Get the currently logged-in user
 
-        //Check if logged in
+        // Check if a user is logged in
         if (!currentUser) {
           console.error('No user logged in');
           return;
         }
 
-        const email = currentUser.email; //currentUser email
-        //reference savedRestaurants database
         const db = getFirestore();
-        const savedRestaurantsRef = collection(db, 'savedRestaurants');
+        const userDocRef = doc(db, 'users', currentUser.uid); // Reference to user's document
+        const userDocSnap = await getDoc(userDocRef); // Fetch the document
 
-        //Query to filter by user's email
-        const querySnapshot = await getDocs(query(savedRestaurantsRef, where('email', '==', email)));
-        
-        //map the records in database to restaurants array
-        const restaurants = querySnapshot.docs.map((doc) => ({id: doc.id,...doc.data(),}));
-        setSavedRestaurants(restaurants);
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const restaurants = userData.savedRestaurants || []; // Get the savedRestaurants field
+          setSavedRestaurants(restaurants); // Update the state with the array of saved restaurants
+        } else {
+          console.error('User document does not exist');
+        }
       } catch (error) {
         console.error('Error fetching saved restaurants:', error);
       } finally {
-        setLoading(false);
+        setLoading(false);// Stop the loading spinner
       }
     };
 
@@ -61,12 +61,12 @@ const Profile = () => {
     <View style={styles.container}>
       <FlatList
         data={savedRestaurants}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()} // Use index as a unique id
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text>{item.restaurantName}</Text>
-            <Text>City: {item.restaurantCity}</Text>
-            <Text>Rating: {item.restaurantRating}</Text>
+            <Text>{item.name}</Text>
+            <Text>City: {item.city}</Text>
+            <Text>Rating: {item.rating}</Text>
           </View>
         )}
       />

@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, ImageBackground, Button, Image } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, ImageBackground, Button} from 'react-native'
 import React, {useState, useEffect} from 'react'
 import RestaurantCard from '../components/RestaurantCard'
 import axios from 'axios'
-import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget'
 import MultiSelect from 'react-native-multiple-select'; // Import the MultiSelect
-import { getFirestore, collection, doc, updateDoc, arrayUnion } from 'firebase/firestore'
+import { getFirestore, doc, updateDoc, arrayUnion } from 'firebase/firestore'
 import { auth } from '../service/firebase'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Entypo from 'react-native-vector-icons/Entypo'
 import {YELP_API_KEY} from '@env';
 
 
@@ -126,6 +127,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
+    
       <View style={styles.optionsContainer}>
         <Text>Enter Location</Text>
         <TextInput
@@ -140,13 +142,6 @@ export default function Home() {
           value={category}
           placeholder="Enter category..."
         />
-         {/* 
-        <TextInput
-          style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-          onChangeText={up3datePrice}
-          value={price}
-          placeholder="Enter price..."
-        /> */}
         <MultiSelect
           items={radiusOptions}
           uniqueKey="id"
@@ -157,10 +152,20 @@ export default function Home() {
           selectText="Select Max Distance"
           styleMainWrapper={{ marginVertical: 10 }}
         />
-
         <Button title='Save' onPress={setPreferences}/>
       </View>
-
+        {/* <TextInput
+          style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+          onChangeText={upadatePrice}
+          value={price}
+          placeholder="Enter price..."
+        />  */}
+        
+            
+        
+      
+      <RestaurantCard restaurant={data[currentIndex]}/>
+{/* 
       {data[currentIndex] && (
         <View style={styles.restaurantCard}>
         <ImageBackground
@@ -175,7 +180,7 @@ export default function Home() {
             <Text>{data[currentIndex].location['display_address']}</Text>
           </ImageBackground>
         </View>
-      )}
+      )} */}
         {/* {data[currentIndex] && (
         <>
           <Text>{data[currentIndex].name} - {data[currentIndex].location.display_address}</Text>
@@ -186,8 +191,14 @@ export default function Home() {
           />
         </>
       )} */}
-      <Button title="Save Restaurant" onPress={saveRestaurant} />
-      <Button title='Next' onPress={nextRestaurant}/>
+      <View style = {styles.addNextContainer}>
+        <TouchableOpacity onPress={nextRestaurant}>
+          <Entypo name="circle-with-cross" size={65} color="#B86767" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={saveRestaurant}>
+          <Ionicons name="heart-circle" size={65} color="#E98DF8" />
+        </TouchableOpacity>    
+      </View>
     </View>
   );
 }
@@ -198,29 +209,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6CCBC'
   },
   optionsContainer: {    
-    backgroundColor: 'white',
-    padding: 10
-  },
-  restaurantCard: {
-    flexDirection: 'column',
+    backgroundColor: '#E6CCBC',
     padding: 10,
-    marginVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#fff',
   },
-  imageBackground: {
-    width: '100%',
-    height: 300,
-    flexDirection: 'column',
+  addNextContainer:{
+    flexDirection: 'row', // Horizontally next to each other
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    gap: 10, 
+    marginVertical: -45
   },
-  name: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 5,
-  },
-  rating: {
-    fontSize: 16,
-    color: 'grey',
-  },
+  addNext:{
+    backgroundColor: 'white'
+  }
 });

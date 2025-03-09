@@ -1,22 +1,46 @@
 import React from 'react';
-import { StyleSheet, Text, ImageBackground } from 'react-native';
-import StarRatingDisplay from 'react-native-star-rating-widget';
+import { StyleSheet, Text, View, ImageBackground } from 'react-native';
+import { StarRatingDisplay } from 'react-native-star-rating-widget';
 
-export default function RestaurantCard({name, image, rating}) {
-  const cappedRating = Math.min(parseFloat(rating) || 0, 5); // Ensure rating is valid and capped
+
+const RestaurantCard = ({ restaurant }) => {
+  if (!restaurant) return null;
+
   return (
-    <ImageBackground style={styles.imageBackground} source={{ uri: image }}>
-            <Text style={styles.name}>{name}</Text>
-            <StarRatingDisplay
-              rating={cappedRating}
-              starSize={25}
-            />
-    </ImageBackground>
-  )
-}
+     <View style={styles.RestaurantCard}>
+            <ImageBackground
+                style={styles.imageBackground}
+                source={{ uri: restaurant.image_url}}
+              > 
+              <Text style={styles.name}>{restaurant.name}</Text>
+              <View style ={styles.ratingsContainer}>
+                <StarRatingDisplay
+                  rating={restaurant.rating}
+                  starSize={25}
+                />
+                <Text style = {{color: "white"}}>{restaurant.review_count} ratings </Text>
+              </View>  
+              </ImageBackground>
+        <View style = {styles.bottomHalf}>
+              <Text>{restaurant.location['display_address']}</Text>
+        </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    imageBackground: {
+  restaurantCard: {
+    flexDirection: 'column',
+    padding: 10,
+    marginVertical: 10,
+    backgroundColor: '#EEDFD5',
+  },
+  bottomHalf: {
+    padding: 40,
+    backgroundColor: "#EEDFD5",
+    borderRadius: 10,
+  },  
+  imageBackground: {
     width: '100%',
     height: 300,
     flexDirection: 'column',
@@ -27,4 +51,14 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 5,
   },
-})
+  rating: {
+    fontSize: 16,
+    color: 'grey',
+  },
+  ratingsContainer: {
+    flexDirection: "row",
+    alignItems: 'center'
+  }
+});
+
+export default RestaurantCard;
